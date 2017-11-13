@@ -1,4 +1,4 @@
-setup_all()
+setup_all() # to compose all the services
 {
 	cd ../../..
 
@@ -10,15 +10,15 @@ setup_all()
 
 	# Deploy
 	docker-compose up -d
-	
+
 }
 
 
-setup_service()
+setup_service() # to recompose a specific service
 {
 	echo "Stopping container $1"
 	docker stop $1
-	
+
 	echo "Removing previous $1 container"
 	docker rm  $1
 
@@ -29,13 +29,13 @@ setup_service()
 	#build_up
 	service_name=$1-microservice
 	cd ../../../$service_name
-	
+
 	mvn clean package
-	
+
 	cd ../docker
 
 	docker-compose build $1
-	
+
 	docker-compose up -d
 }
 
@@ -44,12 +44,13 @@ usage_info()
 echo "
 Usage
 
-	1) deploy.sh -p <profile_name>				: To deploy all images and containers of a docker profile 
+	1) deploy.sh -p <profile_name>				: To deploy all images and containers of a docker profile
 										for e.x deploy.sh -p docker
-	2) deploy.sh -p <profile_name> -i <service name> 	: To stop, remove, build & deploy a specific image/service 
+	2) deploy.sh -p <profile_name> -i <service name> 	: To stop, remove, build & deploy a specific image/service
 										for e.x deploy.sh -p docker -i tracker-ui"
-exit 1															
+exit 1
 }
+
 if [ $# == 0 ]; then
 	usage_info
 else
@@ -88,19 +89,20 @@ else
 				exit 1
 			;;
 		esac
-		
+
 	done
 	if [ $flag1 == 1 ] && [ $flag2 == 1 ]; then
 		case ${service} in
-			tracker)
+			[service_1])
 				setup_service $service
 				;;
-			tracker-ui)
+			[service_2])
 				setup_service $service
 				;;
-			api-gateway)
+			[service_3])
 				setup_service $service
 				;;
+			# you may use an array if you have a lot of services
 			*)
 				echo "This Container cannot be modified"
 				exit 1
@@ -111,7 +113,7 @@ else
 	elif [ $flag1 == 1 ]; then
 		setup_all
 		exit 1
-	
+
 	else
 		usage_info
 	fi
